@@ -1,12 +1,15 @@
 {
   "name": "styled-window-portal",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A react portal which creates a new window and supports styled-components",
-  "main": "lib/styled-window-portal.min.js",
+  "main": "dist/styled-window-portal.min.js",
   "repository": "git@github.com:Briggybros/styled-window-portal.git",
   "author": "Gregory Sims <briggybros.2@googlemail.com>",
   "license": "MIT",
   "private": false,
+  "scripts": {
+    "prepublish": "webpack"
+  },
   "dependencies": {
     "external-styled-components": "^1.0.0",
     "prop-types": "^15.6.0",
@@ -18,8 +21,8 @@
     "babel-eslint": "^8.1.2",
     "babel-loader": "^7.1.2",
     "babel-preset-env": "^1.6.1",
-    "babel-preset-stage-0": "^6.24.1",
     "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
     "eslint": "^4.14.0",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-plugin-import": "^2.8.0",
