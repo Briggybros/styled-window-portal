@@ -68,7 +68,7 @@ class StyledWindowPortal extends React.PureComponent {
         return Object.keys(mergedProps).map((key) => {
             switch (typeof mergedProps[key]) {
             case 'function':
-                return `${key}=${mergedProps.call(this, mergedProps, window)}`;
+                return `${key}=${mergedProps[key].call(this, mergedProps, window)}`;
             case 'boolean':
                 return `${key}=${mergedProps[key] ? 'yes' : 'no'}`;
             default:
