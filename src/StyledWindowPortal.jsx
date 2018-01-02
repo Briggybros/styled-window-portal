@@ -7,6 +7,7 @@ class StyledWindowPortal extends React.PureComponent {
     static propTypes = {
         children: PropTypes.node.isRequired,
         onClose: PropTypes.func,
+        title: PropTypes.string,
         windowProps: PropTypes.shape({
             toolbar: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]),
             location: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]),
@@ -24,6 +25,7 @@ class StyledWindowPortal extends React.PureComponent {
 
     static defaultProps = {
         onClose: () => {},
+        title: 'New Window',
         windowProps: {
             toolbar: false,
             location: false,
@@ -52,6 +54,7 @@ class StyledWindowPortal extends React.PureComponent {
     componentDidMount() {
         this.externalWindow.onunload = this.props.onClose;
 
+        this.externalWindow.document.head.title = this.props.title;
         this.externalWindow.document.body.appendChild(this.container);
     }
 
