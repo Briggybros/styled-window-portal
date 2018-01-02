@@ -54,7 +54,9 @@ class StyledWindowPortal extends React.PureComponent {
     componentDidMount() {
         this.externalWindow.onunload = this.props.onClose;
 
-        this.externalWindow.document.head.title = this.props.title;
+        const title = this.externalWindow.document.createElement('title');
+        title.innerText = this.props.title;
+        this.externalWindow.document.head.appendChild(title);
         this.externalWindow.document.body.appendChild(this.container);
     }
 
