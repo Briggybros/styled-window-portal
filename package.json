@@ -1,6 +1,6 @@
 {
   "name": "styled-window-portal",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "A react portal which creates a new window and supports styled-components",
   "main": "dist/styled-window-portal.min.js",
   "repository": "git@github.com:Briggybros/styled-window-portal.git",
@@ -8,10 +8,11 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "prepublish": "webpack"
+    "build": "webpack",
+    "prepublish": "npm run build"
   },
   "dependencies": {
-    "external-styled-components": "^1.0.0",
+    "external-styled-components": "^1.0.2",
     "prop-types": "^15.6.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0"

@@ -1,5 +1,4 @@
 const path = require('path');
-const webpack = require('webpack');
 
 module.exports = {
     entry: path.join(__dirname, 'src', 'StyledWindowPortal.jsx'),
@@ -35,10 +34,4 @@ module.exports = {
             amd: 'react-dom',
         },
     },
-    plugins: [
-        new webpack.optimize.UglifyJsPlugin({
-            compress: true,
-            comments: false,
-        }),
-    ],
 };

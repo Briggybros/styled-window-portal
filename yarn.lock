@@ -1817,9 +1817,9 @@ external-editor@^2.0.4:
     iconv-lite "^0.4.17"
     tmp "^0.0.33"
 
-external-styled-components@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/external-styled-components/-/external-styled-components-1.0.0.tgz#16dc6f49899d1bb881993e0f74b340d5165fa924"
+external-styled-components@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/external-styled-components/-/external-styled-components-1.0.2.tgz#d1948596c9a4485a9a6a466ca442bf1256fa6029"
   dependencies:
     prop-types "^15.6.0"
     react "^16.2.0"
