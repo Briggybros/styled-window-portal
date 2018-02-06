@@ -8,14 +8,13 @@ module.exports = {
         libraryTarget: 'umd',
     },
     module: {
-        loaders: [{
-            test: /\.j(s|sx)$/,
-            exclude: /node_modules/,
-            loader: 'babel-loader',
-            query: {
-                presets: ['env', 'stage-0', 'react'],
+        rules: [
+            {
+                test: /\.(js|jsx)?$/,
+                loader: 'babel-loader?cacheDirectory',
+                exclude: path.resolve(__dirname, 'node_modules'),
             },
-        }],
+        ],
     },
     resolve: {
         extensions: ['.js', '.jsx'],
@@ -33,11 +32,11 @@ module.exports = {
             commonjs2: 'react-dom',
             amd: 'react-dom',
         },
-        'external-styled-components': {
-            root: 'ReactDOM',
-            commonjs: 'react-dom',
-            commonjs2: 'react-dom',
-            amd: 'react-dom',
+        'styled-components': {
+            root: 'styled-components',
+            commonjs: 'styled-components',
+            commonjs2: 'styled-components',
+            amd: 'styled-components',
         },
     },
 };

@@ -55,7 +55,7 @@ The styled window component can take the following props
 
 ### windowProps ###
 
-All values here can either be constant, or functions, the functions have the other options passed to them as the first parameter, an the main window as the second parameter. See descriptions at https://www.w3schools.com/jsref/met_win_open.asp
+All values here can either be constant, or functions, the functions have the other options passed to them as the first parameter, and the main window as the second parameter. See descriptions at https://www.w3schools.com/jsref/met_win_open.asp
 
 | Prop Name   | Type                | Default Value     |
 |-------------|---------------------|-------------------|

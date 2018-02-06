@@ -1,28 +1,30 @@
+// @flow
 import React from 'react';
 import ReactDOM from 'react-dom';
-import PropTypes from 'prop-types';
-import ExternalStyle from 'external-styled-components';
+import { StyleSheetManager } from 'styled-components';
 
-class StyledWindowPortal extends React.PureComponent {
-    static propTypes = {
-        children: PropTypes.node.isRequired,
-        onClose: PropTypes.func,
-        title: PropTypes.string,
-        windowProps: PropTypes.shape({
-            toolbar: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]),
-            location: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]),
-            directories: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]),
-            status: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]),
-            menubar: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]),
-            scrollbars: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]),
-            resizable: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]),
-            width: PropTypes.oneOfType([PropTypes.number, PropTypes.func]),
-            height: PropTypes.oneOfType([PropTypes.number, PropTypes.func]),
-            top: PropTypes.oneOfType([PropTypes.number, PropTypes.func]),
-            left: PropTypes.oneOfType([PropTypes.number, PropTypes.func]),
-        }),
-    }
+type WindowProps = {
+    toolbar? : Boolean | (props : WindowProps, window : window) => Boolean,
+    location? : Boolean | (props : WindowProps, window : window) => Boolean,
+    directories? : Boolean | (props : WindowProps, window : window) => Boolean,
+    status? : Boolean| (props : WindowProps, window : window) => Boolean,
+    menubar? : Boolean | (props : WindowProps, window : window) => Boolean,
+    scrollbars? : Boolean | (props : WindowProps, window : window) => Boolean,
+    resizable? : Boolean | (props : WindowProps, window : window) => Boolean,
+    width? : Number | (props : WindowProps, window : window) => Number,
+    height? : Number | (props : WindowProps, window : window) => Number,
+    top? : Number | (props : WindowProps, window : window) => Number,
+    left? : Number | (props : WindowProps, window : window) => Number,
+}
 
+type Props = {
+    onClose? : Function,
+    title? : String,
+    windowProps? : WindowProps,
+    children: Node,
+}
+
+class StyledWindowPortal extends React.PureComponent<Props> {
     static defaultProps = {
         onClose: () => {},
         title: 'New Window',
@@ -84,13 +86,13 @@ class StyledWindowPortal extends React.PureComponent {
 
     render() {
         return (
-            <ExternalStyle
-                element={this.externalWindow.document.head}
+            <StyleSheetManager
+                taret={this.externalWindow.document.head}
             >
                 <div>
                     {ReactDOM.createPortal(this.props.children, this.container)}
                 </div>
-            </ExternalStyle>
+            </StyleSheetManager>
         );
     }
 }
