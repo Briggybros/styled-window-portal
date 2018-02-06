@@ -1,6 +1,7 @@
 {
     "parser": "babel-eslint",
     "extends": "airbnb",
+    "plugins": ["flowtype"],
     "rules": {
         "indent": ["error", 4],
         "react/jsx-indent": ["error", 4],
