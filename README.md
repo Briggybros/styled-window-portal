@@ -1,12 +1,23 @@
 # styled-window-portal
-A react portal which creates a new window and supports styled-components.
+If a React portal is used to render to a new window, then styled-components will break as the styles declared are still being appended to the head of the original document. This package combats this by changing the inject point of the style to the head of the new window and copies globally injected styles to the new window.
 
 ## Example ##
 
 ```javascript
 import React from 'react';
 import { render } from 'react-dom';
+import styled, { injectGlobal } from 'styled-components';
 import StyledWindowPortal from 'styled-window-portal';
+
+const MyDiv = styled.div`
+    background: blue;
+`;
+
+injectGlobal`
+    body: {
+        margin: 0;
+    }
+`;
 
 class App() {
     constructor(props) {
@@ -21,21 +32,23 @@ class App() {
         return (
             <div>
                 <button
-                    onClick={() => this.setState({
-                        window: true,
+                    onClick={prevState => this.setState({
+                        window: !prevState.window,
                     })}
                 >
-                    Click me to open a new window
+                    Click me to toggle a new window
                 </button>
-                {this.state.window && <StyledWindowPortal
-                    onClose={() => this.setState({
-                        window: false,
-                    })}
-                >
-                    <div>
-                        A new window, OH MY!
-                    </div>
-                </StyledWindowPortal>}
+                {this.state.window &&
+                    <StyledWindowPortal
+                        onClose={() => this.setState({
+                            window: false,
+                        })}
+                    >
+                        <MyDiv>
+                            Look, it's blue! There are no borders either.
+                        </MyDiv>
+                    </StyledWindowPortal>
+                }
             </div>
         );
     }
