@@ -87,7 +87,7 @@ class StyledWindowPortal extends React.PureComponent<Props> {
     render() {
         return (
             <StyleSheetManager
-                taret={this.externalWindow.document.head}
+                target={this.externalWindow.document.head}
             >
                 <div>
                     {ReactDOM.createPortal(this.props.children, this.container)}
