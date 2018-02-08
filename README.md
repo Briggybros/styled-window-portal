@@ -3,7 +3,7 @@ If a React portal is used to render to a new window, then styled-components will
 
 ## Example ##
 
-```javascript
+```jsx
 import React from 'react';
 import { render } from 'react-dom';
 import styled, { injectGlobal } from 'styled-components';
