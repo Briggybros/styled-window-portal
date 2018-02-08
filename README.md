@@ -45,7 +45,7 @@ class App() {
                         })}
                     >
                         <MyDiv>
-                            Look, it's blue! There are no borders either.
+                            Look, it&apos;s blue! There are no borders either.
                         </MyDiv>
                     </StyledWindowPortal>
                 }
