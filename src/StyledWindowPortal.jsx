@@ -60,6 +60,11 @@ class StyledWindowPortal extends React.PureComponent<Props> {
         title.innerText = this.props.title;
         this.externalWindow.document.head.appendChild(title);
         this.externalWindow.document.body.appendChild(this.container);
+
+        // Inject global style
+        Array.from(document.head.getElementsByTagName('STYLE'))
+            .filter(style => style.innerText.startsWith('\n/* sc-component-id: sc-global'))
+            .forEach(style => this.externalWindow.document.head.appendChild(style.cloneNode(true)));
     }
 
     componentWillUnmount() {
