@@ -1,6 +1,6 @@
 {
   "name": "styled-window-portal",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "A react portal which creates a new window and supports styled-components",
   "main": "lib/styled-window-portal.min.js",
   "repository": "git@github.com:Briggybros/styled-window-portal.git",
