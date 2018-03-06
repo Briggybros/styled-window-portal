@@ -7,6 +7,15 @@
   "author": "Gregory Sims <briggybros.2@googlemail.com>",
   "license": "MIT",
   "private": false,
+  "keywords": [
+    "styled-components",
+    "styled",
+    "components",
+    "style",
+    "window",
+    "react",
+    "portal"
+  ],
   "scripts": {
     "build": "webpack",
     "prepublish": "npm run build"
