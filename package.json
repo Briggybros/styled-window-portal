@@ -41,9 +41,9 @@
     "prepublish": "npm run build"
   },
   "peerDependencies": {
-    "react": "^16.2.0",
-    "react-dom": "^16.2.0",
-    "styled-components": "^4.3.1"
+    "react": ">=16.0.0",
+    "react-dom": ">=16.0.0",
+    "styled-components": ">=3.1.7"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.39",
