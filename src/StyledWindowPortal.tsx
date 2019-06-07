@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import ReactDOM from 'react-dom';
 import { StyleSheetManager } from 'styled-components';
 
@@ -20,10 +20,14 @@ type Props = {
   onClose: ((this: WindowEventHandlers, ev: Event) => any) | null;
   title?: string;
   windowProps?: WindowProps;
-  children: Node;
+  children: ReactNode;
 };
 
-class StyledWindowPortal extends React.PureComponent<Props> {
+type State = {
+  externalWindow: Window | null;
+};
+
+class StyledWindowPortal extends React.PureComponent<Props, State> {
   static defaultProps = {
     onClose: () => {},
     title: 'New Window',
@@ -38,48 +42,61 @@ class StyledWindowPortal extends React.PureComponent<Props> {
       width: 500,
       height: 400,
       top: (props: WindowProps, window: Window) =>
-        (window.innerHeight - window.outerHeight) / 2 + window.screenY,
+        window.screen.height / 2 - window.outerHeight / 2,
       left: (props: WindowProps, window: Window) =>
-        (window.innerWidth - window.outerWidth) / 2 + window.screenX,
+        window.screen.width / 2 - window.outerWidth / 2,
     },
   };
 
   private container: HTMLElement;
-  private externalWindow: Window | null = null;
 
   constructor(props: Props) {
     super(props);
+    this.state = {
+      externalWindow: null,
+    };
     this.container = document.createElement('div');
   }
 
   componentDidMount() {
-    const newWindow = window.open('', '', this.windowPropsToString());
+    this.setState(
+      {
+        externalWindow: window.open('', '', this.windowPropsToString()),
+      },
+      () => {
+        if (this.state.externalWindow != null) {
+          this.state.externalWindow.onunload = this.props.onClose;
 
-    if (newWindow != null) {
-      newWindow.onunload = this.props.onClose;
+          const title = this.state.externalWindow.document.createElement(
+            'title'
+          );
+          title.innerText = !!this.props.title ? this.props.title : '';
+          this.state.externalWindow.document.head.appendChild(title);
 
-      const title = newWindow.document.createElement('title');
-      title.innerText = !!this.props.title ? this.props.title : '';
-      newWindow.document.head.appendChild(title);
-      newWindow.document.body.appendChild(this.container);
+          this.state.externalWindow.document.body.appendChild(this.container);
 
-      // Inject global style
-      Array.from(document.head.getElementsByTagName('STYLE'))
-        .filter(style =>
-          (style as HTMLStyleElement).innerText.startsWith(
-            '\n/* sc-component-id: sc-global'
-          )
-        )
-        .forEach(style =>
-          newWindow.document.head.appendChild(style.cloneNode(true))
-        );
-
-      this.externalWindow = newWindow;
-    }
+          // Inject global style
+          Array.from(document.head.getElementsByTagName('STYLE'))
+            .filter(
+              style =>
+                (style as HTMLStyleElement).innerText.indexOf(
+                  '\n/* sc-component-id: sc-global'
+                ) != -1
+            )
+            .forEach(style => {
+              if (this.state.externalWindow != null) {
+                this.state.externalWindow.document.head.appendChild(
+                  style.cloneNode(true)
+                );
+              }
+            });
+        }
+      }
+    );
   }
 
   componentWillUnmount() {
-    if (!!this.externalWindow) this.externalWindow.close();
+    if (!!this.state.externalWindow) this.state.externalWindow.close();
   }
 
   windowPropsToString() {
@@ -103,9 +120,9 @@ class StyledWindowPortal extends React.PureComponent<Props> {
   }
 
   render() {
-    if (!!this.externalWindow) {
+    if (!!this.state.externalWindow) {
       return (
-        <StyleSheetManager target={this.externalWindow.document.head}>
+        <StyleSheetManager target={this.state.externalWindow.document.head}>
           <div>
             {ReactDOM.createPortal(this.props.children, this.container)}
           </div>
@@ -117,4 +134,4 @@ class StyledWindowPortal extends React.PureComponent<Props> {
   }
 }
 
-export default StyledWindowPortal;
+export { StyledWindowPortal };
