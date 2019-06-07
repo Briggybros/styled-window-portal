@@ -1,15 +1,15 @@
 {
-    "presets": [
-        "@babel/preset-flow",
-        [
-            "@babel/preset-env",
-            {
-                "targets": {
-                    "browsers": ">1%"
-                }
-            }
-        ],
-        "@babel/preset-react",
-        "@babel/preset-stage-0"
-    ]
+  "presets": [
+    "@babel/preset-typescript",
+    [
+      "@babel/preset-env",
+      {
+        "targets": {
+          "browsers": "> 1%"
+        }
+      }
+    ],
+    "@babel/preset-react"
+  ],
+  "plugins": ["@babel/plugin-proposal-class-properties"]
 }

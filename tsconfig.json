@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "es2015",
+    "lib": ["dom", "es2018"],
+    "jsx": "react",
+    "declaration": true,
+    "rootDir": "./src",
+
+    "strict": true,
+
+    "moduleResolution": "node",
+    "baseUrl": "./src",
+    "esModuleInterop": true
+  },
+  "include": ["./src"]
+}
