@@ -1,6 +1,6 @@
 {
   "name": "styled-window-portal",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "description": "A react portal which creates a new window and supports styled-components",
   "keywords": [
     "styled-components",
