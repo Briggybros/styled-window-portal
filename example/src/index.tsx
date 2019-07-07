@@ -46,6 +46,7 @@ class App extends React.Component<any, State> {
                 window: false,
               })
             }
+            autoClose
           >
             <MyDiv>Look, it&apos;s blue! There are no borders either.</MyDiv>
           </StyledWindowPortal>
