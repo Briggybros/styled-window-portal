@@ -100,6 +100,18 @@ class StyledWindowPortal extends React.PureComponent<Props, State> {
     }
   }
 
+  componentDidUpdate(prevProps: Props) {
+    if (!prevProps.autoClose && this.props.autoClose) {
+      // autoClose became enabled
+      window.addEventListener("unload", this.closeExternalWindow);
+    }
+
+    if (prevProps.autoClose && !this.props.autoClose) {
+      // autoClose became disabled
+      window.removeEventListener("unload", this.closeExternalWindow);
+    }
+  }
+
   componentWillUnmount() {
     if (this.props.autoClose) {
       window.removeEventListener("unload", this.closeExternalWindow);
