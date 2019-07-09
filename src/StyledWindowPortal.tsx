@@ -18,6 +18,7 @@ type WindowProps = {
 
 type Props = {
   onClose: ((this: WindowEventHandlers, ev: Event) => any) | null;
+  autoClose: boolean;
   title?: string;
   windowProps?: WindowProps;
   children: ReactNode;
@@ -93,11 +94,37 @@ class StyledWindowPortal extends React.PureComponent<Props, State> {
         }
       }
     );
+
+    if (this.props.autoClose) {
+      window.addEventListener("unload", this.closeExternalWindow);
+    }
+  }
+
+  componentDidUpdate(prevProps: Props) {
+    if (!prevProps.autoClose && this.props.autoClose) {
+      // autoClose became enabled
+      window.addEventListener("unload", this.closeExternalWindow);
+    }
+
+    if (prevProps.autoClose && !this.props.autoClose) {
+      // autoClose became disabled
+      window.removeEventListener("unload", this.closeExternalWindow);
+    }
   }
 
   componentWillUnmount() {
-    if (!!this.state.externalWindow) this.state.externalWindow.close();
+    if (this.props.autoClose) {
+      window.removeEventListener("unload", this.closeExternalWindow);
+    }
+
+    this.closeExternalWindow();
   }
+
+  closeExternalWindow = () => {
+    if (this.state.externalWindow && !this.state.externalWindow.closed) {
+        this.state.externalWindow.close();
+    }
+  };
 
   windowPropsToString() {
     const mergedProps: { [key: string]: any } = {

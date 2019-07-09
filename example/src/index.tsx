@@ -15,6 +15,7 @@ const GlobalStyle = createGlobalStyle`
 
 interface State {
   window: boolean;
+  autoClose: boolean;
 }
 
 class App extends React.Component<any, State> {
@@ -23,6 +24,7 @@ class App extends React.Component<any, State> {
 
     this.state = {
       window: false,
+      autoClose: false,
     };
   }
 
@@ -39,6 +41,22 @@ class App extends React.Component<any, State> {
         >
           Click me to {this.state.window ? 'close' : 'open'} the window
         </button>
+
+        <p>
+          <label>
+            <input
+              type="checkbox"
+              checked={this.state.autoClose}
+              onChange={() =>
+                this.setState({
+                  autoClose: !this.state.autoClose,
+                })
+              }
+            />
+            Auto close child window when parent is closed
+          </label>
+        </p>
+
         {this.state.window && (
           <StyledWindowPortal
             onClose={() =>
@@ -46,6 +64,7 @@ class App extends React.Component<any, State> {
                 window: false,
               })
             }
+            autoClose={this.state.autoClose}
           >
             <MyDiv>Look, it&apos;s blue! There are no borders either.</MyDiv>
           </StyledWindowPortal>
