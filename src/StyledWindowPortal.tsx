@@ -20,6 +20,7 @@ type Props = {
   onClose: ((this: WindowEventHandlers, ev: Event) => any) | null;
   autoClose: boolean;
   title?: string;
+  name?: string;
   windowProps?: WindowProps;
   children: ReactNode;
 };
@@ -32,6 +33,7 @@ class StyledWindowPortal extends React.PureComponent<Props, State> {
   static defaultProps = {
     onClose: () => {},
     title: 'New Window',
+    name: '',
     windowProps: {
       toolbar: false,
       location: false,
@@ -62,7 +64,11 @@ class StyledWindowPortal extends React.PureComponent<Props, State> {
   componentDidMount() {
     this.setState(
       {
-        externalWindow: window.open('', '', this.windowPropsToString()),
+        externalWindow: window.open(
+          '',
+          this.props.name,
+          this.windowPropsToString()
+        ),
       },
       () => {
         if (this.state.externalWindow != null) {
@@ -96,25 +102,25 @@ class StyledWindowPortal extends React.PureComponent<Props, State> {
     );
 
     if (this.props.autoClose) {
-      window.addEventListener("unload", this.closeExternalWindow);
+      window.addEventListener('unload', this.closeExternalWindow);
     }
   }
 
   componentDidUpdate(prevProps: Props) {
     if (!prevProps.autoClose && this.props.autoClose) {
       // autoClose became enabled
-      window.addEventListener("unload", this.closeExternalWindow);
+      window.addEventListener('unload', this.closeExternalWindow);
     }
 
     if (prevProps.autoClose && !this.props.autoClose) {
       // autoClose became disabled
-      window.removeEventListener("unload", this.closeExternalWindow);
+      window.removeEventListener('unload', this.closeExternalWindow);
     }
   }
 
   componentWillUnmount() {
     if (this.props.autoClose) {
-      window.removeEventListener("unload", this.closeExternalWindow);
+      window.removeEventListener('unload', this.closeExternalWindow);
     }
 
     this.closeExternalWindow();
@@ -122,7 +128,7 @@ class StyledWindowPortal extends React.PureComponent<Props, State> {
 
   closeExternalWindow = () => {
     if (this.state.externalWindow && !this.state.externalWindow.closed) {
-        this.state.externalWindow.close();
+      this.state.externalWindow.close();
     }
   };
 
