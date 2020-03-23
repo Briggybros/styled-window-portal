@@ -64,19 +64,13 @@ class StyledWindowPortal extends React.PureComponent<Props, State> {
   componentDidMount() {
     this.setState(
       {
-        externalWindow: window.open(
-          '',
-          this.props.name,
-          this.windowPropsToString()
-        ),
+        externalWindow: window.open('', this.props.name, this.windowPropsToString()),
       },
       () => {
         if (this.state.externalWindow != null) {
           this.state.externalWindow.onunload = this.props.onClose;
 
-          const title = this.state.externalWindow.document.createElement(
-            'title'
-          );
+          const title = this.state.externalWindow.document.createElement('title');
           title.innerText = !!this.props.title ? this.props.title : '';
           this.state.externalWindow.document.head.appendChild(title);
 
@@ -102,25 +96,25 @@ class StyledWindowPortal extends React.PureComponent<Props, State> {
     );
 
     if (this.props.autoClose) {
-      window.addEventListener('unload', this.closeExternalWindow);
+      window.addEventListener("unload", this.closeExternalWindow);
     }
   }
 
   componentDidUpdate(prevProps: Props) {
     if (!prevProps.autoClose && this.props.autoClose) {
       // autoClose became enabled
-      window.addEventListener('unload', this.closeExternalWindow);
+      window.addEventListener("unload", this.closeExternalWindow);
     }
 
     if (prevProps.autoClose && !this.props.autoClose) {
       // autoClose became disabled
-      window.removeEventListener('unload', this.closeExternalWindow);
+      window.removeEventListener("unload", this.closeExternalWindow);
     }
   }
 
   componentWillUnmount() {
     if (this.props.autoClose) {
-      window.removeEventListener('unload', this.closeExternalWindow);
+      window.removeEventListener("unload", this.closeExternalWindow);
     }
 
     this.closeExternalWindow();
