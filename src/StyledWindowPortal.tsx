@@ -20,6 +20,7 @@ type Props = {
   onClose: ((this: WindowEventHandlers, ev: Event) => any) | null;
   autoClose: boolean;
   title?: string;
+  name?: string;
   windowProps?: WindowProps;
   children: ReactNode;
 };
@@ -32,6 +33,7 @@ class StyledWindowPortal extends React.PureComponent<Props, State> {
   static defaultProps = {
     onClose: () => {},
     title: 'New Window',
+    name: '',
     windowProps: {
       toolbar: false,
       location: false,
@@ -62,15 +64,13 @@ class StyledWindowPortal extends React.PureComponent<Props, State> {
   componentDidMount() {
     this.setState(
       {
-        externalWindow: window.open('', '', this.windowPropsToString()),
+        externalWindow: window.open('', this.props.name, this.windowPropsToString()),
       },
       () => {
         if (this.state.externalWindow != null) {
           this.state.externalWindow.onunload = this.props.onClose;
 
-          const title = this.state.externalWindow.document.createElement(
-            'title'
-          );
+          const title = this.state.externalWindow.document.createElement('title');
           title.innerText = !!this.props.title ? this.props.title : '';
           this.state.externalWindow.document.head.appendChild(title);
 
@@ -122,7 +122,7 @@ class StyledWindowPortal extends React.PureComponent<Props, State> {
 
   closeExternalWindow = () => {
     if (this.state.externalWindow && !this.state.externalWindow.closed) {
-        this.state.externalWindow.close();
+      this.state.externalWindow.close();
     }
   };
 
