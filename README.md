@@ -53,7 +53,6 @@ class App extends React.Component<any, State> {
                 window: false,
               })
             }
-            autoClose
           >
             <MyDiv>Look, it&apos;s blue! There are no borders either.</MyDiv>
           </StyledWindowPortal>
@@ -72,7 +71,6 @@ The styled window component can take the following props
 | Prop Name   | Type     | Default Value | Description                                    |
 | ----------- | -------- | ------------- | ---------------------------------------------- |
 | onClose     | function | N/A           | A function called when the window is closed    |
-| autoClose   | boolean  | false         | Close child window when parent is closed       |
 | title       | string   | New Window    | The title of the window                        |
 | name        | string   | ' '           | The target attribute or the name of the window |
 | windowProps | object   |               | See below                                      |

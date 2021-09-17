@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { StyleSheetManager } from 'styled-components';
 
@@ -17,154 +17,135 @@ type WindowProps = {
 };
 
 type Props = {
-  onClose: ((this: WindowEventHandlers, ev: Event) => any) | null;
-  autoClose: boolean;
+  onClose?: (() => any);
   title?: string;
   name?: string;
   windowProps?: WindowProps;
   children: ReactNode;
 };
 
-type State = {
-  externalWindow: Window | null;
-};
-
-class StyledWindowPortal extends React.PureComponent<Props, State> {
-  static defaultProps = {
-    onClose: () => {},
-    title: 'New Window',
-    name: '',
-    windowProps: {
-      toolbar: false,
-      location: false,
-      directories: false,
-      status: false,
-      menubar: false,
-      scrollbars: true,
-      resizable: true,
-      width: 500,
-      height: 400,
-      top: (props: WindowProps, window: Window) =>
-        window.screen.height / 2 - window.outerHeight / 2,
-      left: (props: WindowProps, window: Window) =>
-        window.screen.width / 2 - window.outerWidth / 2,
-    },
+function windowPropsToString(props: WindowProps) {
+  const mergedProps: { [key: string]: any } = {
+    ...StyledWindowPortal.defaultProps.windowProps,
+    ...props,
   };
 
-  private container: HTMLElement;
-
-  constructor(props: Props) {
-    super(props);
-    this.state = {
-      externalWindow: null,
-    };
-    this.container = document.createElement('div');
-  }
-
-  componentDidMount() {
-    this.setState(
-      {
-        externalWindow: window.open(
-          '',
-          this.props.name,
-          this.windowPropsToString()
-        ),
-      },
-      () => {
-        if (this.state.externalWindow != null) {
-          this.state.externalWindow.onunload = this.props.onClose;
-
-          const title = this.state.externalWindow.document.createElement(
-            'title'
-          );
-          title.innerText = !!this.props.title ? this.props.title : '';
-          this.state.externalWindow.document.head.appendChild(title);
-
-          this.state.externalWindow.document.body.appendChild(this.container);
-
-          // Inject global style
-          Array.from(document.head.getElementsByTagName('STYLE'))
-            .filter(
-              style =>
-                (style as HTMLStyleElement).innerText.indexOf(
-                  '\n/* sc-component-id: sc-global'
-                ) != -1
-            )
-            .forEach(style => {
-              if (this.state.externalWindow != null) {
-                this.state.externalWindow.document.head.appendChild(
-                  style.cloneNode(true)
-                );
-              }
-            });
-        }
+  return Object.keys(mergedProps)
+    .map(key => {
+      switch (typeof mergedProps[key]) {
+        case 'function':
+          return `${key}=${(mergedProps[key] as Function)(mergedProps, window)}`;
+        case 'boolean':
+          return `${key}=${mergedProps[key] ? 'yes' : 'no'}`;
+        default:
+          return `${key}=${mergedProps[key]}`;
       }
-    );
+    })
+    .join(',');
+}
 
-    if (this.props.autoClose) {
-      window.addEventListener('unload', this.closeExternalWindow);
-    }
-  }
-
-  componentDidUpdate(prevProps: Props) {
-    if (!prevProps.autoClose && this.props.autoClose) {
-      // autoClose became enabled
-      window.addEventListener('unload', this.closeExternalWindow);
-    }
-
-    if (prevProps.autoClose && !this.props.autoClose) {
-      // autoClose became disabled
-      window.removeEventListener('unload', this.closeExternalWindow);
-    }
-  }
-
-  componentWillUnmount() {
-    if (this.props.autoClose) {
-      window.removeEventListener('unload', this.closeExternalWindow);
-    }
-
-    this.closeExternalWindow();
-  }
-
-  closeExternalWindow = () => {
-    if (this.state.externalWindow && !this.state.externalWindow.closed) {
-      this.state.externalWindow.close();
-    }
-  };
-
-  windowPropsToString() {
-    const mergedProps: { [key: string]: any } = {
-      ...StyledWindowPortal.defaultProps.windowProps,
-      ...this.props.windowProps,
-    };
-
-    return Object.keys(mergedProps)
-      .map(key => {
-        switch (typeof mergedProps[key]) {
-          case 'function':
-            return `${key}=${mergedProps[key].call(this, mergedProps, window)}`;
-          case 'boolean':
-            return `${key}=${mergedProps[key] ? 'yes' : 'no'}`;
-          default:
-            return `${key}=${mergedProps[key]}`;
-        }
-      })
-      .join(',');
-  }
-
-  render() {
-    if (!!this.state.externalWindow) {
-      return (
-        <StyleSheetManager target={this.state.externalWindow.document.head}>
-          <div>
-            {ReactDOM.createPortal(this.props.children, this.container)}
-          </div>
-        </StyleSheetManager>
+function injectGlobalStyle(win: Window) {
+  Array.from(document.head.querySelectorAll('style[data-styled]'))
+    .forEach(style => {
+      win.document.head.appendChild(
+        style.cloneNode(true)
       );
+    });
+}
+
+function StyledWindowPortal({
+  name = StyledWindowPortal.defaultProps.name,
+  title = StyledWindowPortal.defaultProps.title,
+  windowProps = StyledWindowPortal.defaultProps.windowProps,
+  onClose = StyledWindowPortal.defaultProps.onClose,
+  children
+}: Props) {
+
+  // Window in use
+  const [externalWindow, setExternalWindow] = useState<Window | null>(null);
+  // Ref to div for portal
+  const containerRef = useRef(document.createElement('div'));
+
+  function closeWindow() {
+    return externalWindow?.close();
+  }
+
+  // On mount, create window
+  useEffect(() => {
+    const win = window.open(
+      '',
+      name,
+      windowPropsToString(windowProps)
+    )
+
+    if (!win) { throw new Error("Failed to open new window") }
+
+    win.onunload = onClose;
+
+    const titleElement = win.document.createElement(
+      'title'
+    );
+    titleElement.innerText = !!title ? title : '';
+    win.document.head.appendChild(titleElement);
+
+    win.document.body.appendChild(containerRef.current);
+
+    injectGlobalStyle(win);
+
+    setExternalWindow(win);
+  }, []);
+
+  // Close window on this window close
+  useEffect(() => {
+
+    if (!!externalWindow) {
+      window.addEventListener('beforeunload', closeWindow);
     } else {
-      return null;
+      window.removeEventListener('beforeunload', closeWindow);
     }
+  }, [externalWindow]);
+
+  // Close window on unmount
+  useEffect(() => {
+    if (!!externalWindow) {
+      return () => {
+        closeWindow();
+      }
+    }
+  }, [externalWindow]);
+
+  if (!!externalWindow) {
+    return (
+      <StyleSheetManager target={externalWindow.document.head}>
+        <div>
+          {ReactDOM.createPortal(children, containerRef.current)}
+        </div>
+      </StyleSheetManager>
+    );
+  } else {
+    return null;
   }
 }
+
+StyledWindowPortal.defaultProps = {
+  onClose: () => { },
+  title: 'New Window',
+  name: '',
+  windowProps: {
+    toolbar: false,
+    location: false,
+    directories: false,
+    status: false,
+    menubar: false,
+    scrollbars: true,
+    resizable: true,
+    width: 500,
+    height: 400,
+    top: (props: WindowProps, window: Window) =>
+      window.screen.height / 2 - window.outerHeight / 2,
+    left: (props: WindowProps, window: Window) =>
+      window.screen.width / 2 - window.outerWidth / 2,
+  },
+};
 
 export { StyledWindowPortal };
