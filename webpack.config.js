@@ -7,11 +7,15 @@ module.exports = {
     filename: 'styled-window-portal.min.js',
     libraryTarget: 'umd',
   },
+  mode: 'production',
   module: {
     rules: [
       {
         test: /\.(js|jsx|ts|tsx)?$/,
-        loader: 'babel-loader?cacheDirectory',
+        loader: 'babel-loader',
+        options: {
+          cacheDirectory: true,
+        },
         exclude: path.resolve(__dirname, 'node_modules'),
       },
     ],
