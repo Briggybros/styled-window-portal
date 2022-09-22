@@ -14,6 +14,11 @@ export type StyledWindowPortalProps = PropsWithChildren<{
   onClose?: () => any;
   onOpen?: (win: Window | null) => void;
   target?: string;
+  /**
+   * @deprecated
+   * @see target
+   */
+  name?: string;
   title?: string;
   windowProps?: WindowProps;
 }>;
@@ -23,6 +28,7 @@ export function StyledWindowPortal({
   onClose = StyledWindowPortal.defaultProps.onClose,
   onOpen = StyledWindowPortal.defaultProps.onOpen,
   target = StyledWindowPortal.defaultProps.target,
+  name = StyledWindowPortal.defaultProps.name,
   title = StyledWindowPortal.defaultProps.title,
   windowProps = StyledWindowPortal.defaultProps.windowProps,
 }: StyledWindowPortalProps) {
@@ -32,7 +38,7 @@ export function StyledWindowPortal({
   );
 
   // Create window
-  const externalWindow = useWindow(target, winProps);
+  const externalWindow = useWindow(target ?? name, winProps);
   
   // Container to portal into
   const containerRef = useContainer(externalWindow);
@@ -82,6 +88,7 @@ StyledWindowPortal.defaultProps = {
   onOpen: undefined,
   title: 'New Window',
   target: '',
+  name: '',
   windowProps: {
     toolbar: false,
     location: false,
