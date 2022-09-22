@@ -1,68 +1,8 @@
 # styled-window-portal
 
-If a React portal is used to render to a new window, then styled-components will break as the styles declared are still being appended to the head of the original document. This package combats this by changing the inject point of the style to the head of the new window and copies globally injected styles to the new window.
+If a React portal is used to render to a new window, then styled-components will break as the styles declared are still being appended to the head of the original document. This package provides a component which changes the inject point of the style to the head of the new window and copies globally injected styles to the new window.
 
-## Example
-
-```tsx
-import React from 'react';
-import { render } from 'react-dom';
-import styled, { createGlobalStyle } from 'styled-components';
-import { StyledWindowPortal } from '../../src';
-
-const MyDiv = styled.div`
-  background: blue;
-`;
-
-const GlobalStyle = createGlobalStyle`
-    body {
-        margin: 0;
-    }
-`;
-
-interface State {
-  window: boolean;
-}
-
-class App extends React.Component<any, State> {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      window: false,
-    };
-  }
-
-  render() {
-    return (
-      <div>
-        <GlobalStyle />
-        <button
-          onClick={() =>
-            this.setState({
-              window: !this.state.window,
-            })
-          }
-        >
-          Click me to {this.state.window ? 'close' : 'open'} the window
-        </button>
-        {this.state.window && (
-          <StyledWindowPortal
-            onClose={() =>
-              this.setState({
-                window: false,
-              })
-            }
-          >
-            <MyDiv>Look, it&apos;s blue! There are no borders either.</MyDiv>
-          </StyledWindowPortal>
-        )}
-      </div>
-    );
-  }
-}
-render(<App />, document.getElementById('app'));
-```
+## [Example](https://github.com/Briggybros/styled-window-portal/blob/master/example/src/index.tsx)
 
 ## Props
 
