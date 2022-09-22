@@ -73,7 +73,7 @@ The styled window component can take the following props
 | onClose     | function | N/A           | A function called when the window is closed    |
 | onOpen      | function | N/A           | A function called when the window is opened    |
 | title       | string   | New Window    | The title of the window                        |
-| name        | string   | ' '           | The target attribute or the name of the window |
+| target      | string   | ' '           | The target attribute or the name of the window |
 | windowProps | object   |               | See below                                      |
 
 ### windowProps
