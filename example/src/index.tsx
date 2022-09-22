@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { render } from 'react-dom';
 import styled, { createGlobalStyle } from 'styled-components';
+import { useInterval } from 'usehooks-ts';
 import { StyledWindowPortal } from '../../src';
 
 const MyDiv = styled.div`
@@ -13,46 +14,39 @@ const GlobalStyle = createGlobalStyle`
     }
 `;
 
-interface State {
-  window: boolean;
-}
+function App() {
+  const [window, setWindow] = useState(false);
 
-class App extends React.Component<any, State> {
-  constructor(props) {
-    super(props);
+  const [count, setCount] = useState(0);
+  useInterval(() => {
+    setCount((count) => (count + 1) % 100);
+  }, 500);
 
-    this.state = {
-      window: false,
-    };
-  }
+  const title = useMemo(() => `Title: ${count}`, [count])
 
-  render() {
-    return (
-      <div>
-        <GlobalStyle />
-        <button
-          onClick={() =>
-            this.setState({
-              window: !this.state.window,
-            })
+  return (
+    <div>
+      <GlobalStyle />
+      <button
+        onClick={() =>
+          setWindow((win) => !win)
+        }
+      >
+        Click me to {window ? 'close' : 'open'} the window
+      </button>
+
+      {window && (
+        <StyledWindowPortal
+          title={title}
+          onClose={() =>
+            setWindow(false)
           }
         >
-          Click me to {this.state.window ? 'close' : 'open'} the window
-        </button>
-
-        {this.state.window && (
-          <StyledWindowPortal
-            onClose={() =>
-              this.setState({
-                window: false,
-              })
-            }
-          >
-            <MyDiv>Look, it&apos;s blue! There are no borders either.</MyDiv>
-          </StyledWindowPortal>
-        )}
-      </div>
-    );
-  }
+          <MyDiv>Look, it&apos;s blue! There are no borders either.</MyDiv>
+        </StyledWindowPortal>
+      )}
+    </div>
+  );
 }
+
 render(<App />, document.getElementById('app'));

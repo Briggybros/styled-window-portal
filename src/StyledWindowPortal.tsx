@@ -1,4 +1,10 @@
-import React, { PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import ReactDOM from 'react-dom';
 import { StyleSheetManager } from 'styled-components';
 
@@ -24,10 +30,15 @@ export function StyledWindowPortal({
 }: StyledWindowPortalProps) {
   // Window in use
   const [externalWindow, setExternalWindow] = useState<Window | null>(null);
+  
   // Ref to div for portal
   const containerRef = useRef(document.createElement('div'));
+  // Title ref
+  const titleRef = useRef(document.createElement('title'));
 
-  const closeWindow = useCallback(() => externalWindow?.close(), [externalWindow]);
+  const closeWindow = useCallback(() => externalWindow?.close(), [
+    externalWindow,
+  ]);
 
   // Create window
   useEffect(() => {
@@ -46,16 +57,21 @@ export function StyledWindowPortal({
 
     win.onunload = onClose;
 
-    const titleElement = win.document.createElement('title');
-    titleElement.innerText = !!title ? title : '';
-    win.document.head.appendChild(titleElement);
-
+    win.document.head.appendChild(titleRef.current);
     win.document.body.appendChild(containerRef.current);
 
     injectGlobalStyle(win);
 
     setExternalWindow(win);
   }, []);
+
+  // Update title on change
+  useEffect(() => {
+    const titleEl = titleRef.current;
+    if (!titleEl) return;
+
+    titleEl.innerText = title;
+  }, [title, titleRef]);
 
   // Close window on this window close
   useEffect(() => {
