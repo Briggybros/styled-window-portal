@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, useEffect, useRef, useState } from 'react';
+import React, { PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { StyleSheetManager } from 'styled-components';
 
@@ -27,11 +27,9 @@ export function StyledWindowPortal({
   // Ref to div for portal
   const containerRef = useRef(document.createElement('div'));
 
-  function closeWindow() {
-    return externalWindow?.close();
-  }
+  const closeWindow = useCallback(() => externalWindow?.close(), [externalWindow]);
 
-  // On mount, create window
+  // Create window
   useEffect(() => {
     const win = window.open(
       '',
