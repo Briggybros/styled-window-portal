@@ -18,6 +18,7 @@ type WindowProps = {
 
 type Props = {
   onClose?: (() => any);
+  onOpen?: ((win: Window | null) => void);
   title?: string;
   name?: string;
   windowProps?: WindowProps;
@@ -58,6 +59,7 @@ function StyledWindowPortal({
   title = StyledWindowPortal.defaultProps.title,
   windowProps = StyledWindowPortal.defaultProps.windowProps,
   onClose = StyledWindowPortal.defaultProps.onClose,
+  onOpen = StyledWindowPortal.defaultProps.onOpen,
   children
 }: Props) {
 
@@ -114,6 +116,13 @@ function StyledWindowPortal({
     }
   }, [externalWindow]);
 
+  // Call onOpen with externalWindow if they're defined
+  useEffect(() => {
+    if (externalWindow && onOpen) {
+      onOpen(externalWindow)
+    }
+  }, [externalWindow, onOpen])
+
   if (!!externalWindow) {
     return (
       <StyleSheetManager target={externalWindow.document.head}>
@@ -129,6 +138,7 @@ function StyledWindowPortal({
 
 StyledWindowPortal.defaultProps = {
   onClose: () => { },
+  onOpen: undefined,
   title: 'New Window',
   name: '',
   windowProps: {
