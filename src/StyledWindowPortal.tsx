@@ -9,114 +9,48 @@ import ReactDOM from 'react-dom';
 import { StyleSheetManager } from 'styled-components';
 
 import { WindowProps } from './window-props';
-import { windowPropsToString } from './window-props-to-string';
-import { injectGlobalStyle } from './inject-global-style';
+import { injectGlobalStyle } from './util/inject-global-style';
+import { useWindow } from './hooks/use-window';
+import { useTitle } from './hooks/use-title';
+import { useContainer } from './hooks/use-container';
 
 export type StyledWindowPortalProps = PropsWithChildren<{
   onClose?: () => any;
   onOpen?: (win: Window | null) => void;
+  target?: string;
   title?: string;
-  name?: string;
   windowProps?: WindowProps;
 }>;
 
 export function StyledWindowPortal({
-  name = StyledWindowPortal.defaultProps.name,
-  title = StyledWindowPortal.defaultProps.title,
-  windowProps = StyledWindowPortal.defaultProps.windowProps,
+  children,
   onClose = StyledWindowPortal.defaultProps.onClose,
   onOpen = StyledWindowPortal.defaultProps.onOpen,
-  children,
+  target = StyledWindowPortal.defaultProps.target,
+  title = StyledWindowPortal.defaultProps.title,
+  windowProps = StyledWindowPortal.defaultProps.windowProps,
 }: StyledWindowPortalProps) {
-  // Ref to div for portal
-  const containerRef = useRef(document.createElement('div'));
-  // Title ref
-  const titleRef = useRef(document.createElement('title'));
-
-  // Window in use
-  const [externalWindow, setExternalWindow] = useState<Window | null>(null);
-
   // Create window
+  const externalWindow = useWindow(target, {
+    ...StyledWindowPortal.defaultProps.windowProps,
+    ...windowProps,
+  });
+
+  useTitle(title, externalWindow);
+  const containerRef = useContainer(externalWindow);
+
+  // Inject styles into window
   useEffect(() => {
-    const win = window.open(
-      '',
-      name,
-      windowPropsToString({
-        ...StyledWindowPortal.defaultProps.windowProps,
-        ...windowProps,
-      })
-    );
+    if (!externalWindow) return;
 
-    if (!win) {
-      throw new Error('Failed to open new window');
-    }
-
-    injectGlobalStyle(win);
-    setExternalWindow(win);
-
-    win.addEventListener('beforeunload', () => {
-      setExternalWindow(null);
-    })
-
-    return () => {
-      win?.close();
-    };
-  }, []);
+    injectGlobalStyle(externalWindow);
+  }, [externalWindow]);
 
   // Link onClose handler
   useEffect(() => {
     if (!externalWindow) return;
     externalWindow.onunload = onClose;
   }, [externalWindow, onClose]);
-
-  // Make sure window has title
-  useEffect(() => {
-    if (!externalWindow) return;
-
-    const existingTitle = externalWindow.document.querySelector('title');
-
-    if (existingTitle === titleRef.current) return;
-
-    if (existingTitle) {
-      externalWindow.document.head.removeChild(existingTitle);
-    }
-
-    externalWindow.document.head.appendChild(titleRef.current);
-  }, [externalWindow, titleRef]);
-
-  // Update title on change
-  useEffect(() => {
-    const titleEl = titleRef.current;
-    if (!titleEl) return;
-
-    titleEl.innerText = title;
-  }, [title, titleRef]);
-
-  // Make sure window has container
-  useEffect(() => {
-    if (!externalWindow) return;
-
-    const existingContainer = externalWindow.document.querySelector('body>div');
-
-    if (existingContainer === containerRef.current) return;
-
-    if (existingContainer) {
-      externalWindow.document.body.removeChild(existingContainer);
-    }
-
-    externalWindow.document.body.appendChild(containerRef.current);
-  }, [externalWindow, containerRef]);
-
-  // Close window on this window close
-  useEffect(() => {
-    const close = () => externalWindow?.close();
-
-    window.addEventListener('beforeunload', close);
-
-    return () => {
-      window.removeEventListener('beforeunload', close);
-    };
-  }, [externalWindow]);
 
   // Call onOpen with externalWindow if they're defined
   useEffect(() => {
@@ -140,7 +74,7 @@ StyledWindowPortal.defaultProps = {
   onClose: () => {},
   onOpen: undefined,
   title: 'New Window',
-  name: '',
+  target: '',
   windowProps: {
     toolbar: false,
     location: false,

@@ -1,4 +1,4 @@
-import { WindowProps } from './window-props';
+import { WindowProps } from '../window-props';
 
 export function windowPropsToString(props: WindowProps) {
   return Object.entries(props)
