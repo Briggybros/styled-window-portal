@@ -1,68 +1,27 @@
-import React, { ReactNode, useEffect, useRef, useState } from 'react';
+import React, { PropsWithChildren, useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { StyleSheetManager } from 'styled-components';
 
-type WindowProps = {
-  toolbar?: Boolean | ((props: WindowProps, window: Window) => Boolean);
-  location?: Boolean | ((props: WindowProps, window: Window) => Boolean);
-  directories?: Boolean | ((props: WindowProps, window: Window) => Boolean);
-  status?: Boolean | ((props: WindowProps, window: Window) => Boolean);
-  menubar?: Boolean | ((props: WindowProps, window: Window) => Boolean);
-  scrollbars?: Boolean | ((props: WindowProps, window: Window) => Boolean);
-  resizable?: Boolean | ((props: WindowProps, window: Window) => Boolean);
-  width?: Number | ((props: WindowProps, window: Window) => Number);
-  height?: Number | ((props: WindowProps, window: Window) => Number);
-  top?: Number | ((props: WindowProps, window: Window) => Number);
-  left?: Number | ((props: WindowProps, window: Window) => Number);
-};
+import { WindowProps } from './window-props';
+import { windowPropsToString } from './window-props-to-string';
+import { injectGlobalStyle } from './inject-global-style';
 
-type Props = {
-  onClose?: (() => any);
-  onOpen?: ((win: Window | null) => void);
+export type StyledWindowPortalProps = PropsWithChildren<{
+  onClose?: () => any;
+  onOpen?: (win: Window | null) => void;
   title?: string;
   name?: string;
   windowProps?: WindowProps;
-  children: ReactNode;
-};
+}>;
 
-function windowPropsToString(props: WindowProps) {
-  const mergedProps: { [key: string]: any } = {
-    ...StyledWindowPortal.defaultProps.windowProps,
-    ...props,
-  };
-
-  return Object.keys(mergedProps)
-    .map(key => {
-      switch (typeof mergedProps[key]) {
-        case 'function':
-          return `${key}=${(mergedProps[key] as Function)(mergedProps, window)}`;
-        case 'boolean':
-          return `${key}=${mergedProps[key] ? 'yes' : 'no'}`;
-        default:
-          return `${key}=${mergedProps[key]}`;
-      }
-    })
-    .join(',');
-}
-
-function injectGlobalStyle(win: Window) {
-  Array.from(document.head.querySelectorAll('style[data-styled]'))
-    .forEach(style => {
-      win.document.head.appendChild(
-        style.cloneNode(true)
-      );
-    });
-}
-
-function StyledWindowPortal({
+export function StyledWindowPortal({
   name = StyledWindowPortal.defaultProps.name,
   title = StyledWindowPortal.defaultProps.title,
   windowProps = StyledWindowPortal.defaultProps.windowProps,
   onClose = StyledWindowPortal.defaultProps.onClose,
   onOpen = StyledWindowPortal.defaultProps.onOpen,
-  children
-}: Props) {
-
+  children,
+}: StyledWindowPortalProps) {
   // Window in use
   const [externalWindow, setExternalWindow] = useState<Window | null>(null);
   // Ref to div for portal
@@ -77,16 +36,19 @@ function StyledWindowPortal({
     const win = window.open(
       '',
       name,
-      windowPropsToString(windowProps)
-    )
+      windowPropsToString({
+        ...StyledWindowPortal.defaultProps.windowProps,
+        ...windowProps,
+      })
+    );
 
-    if (!win) { throw new Error("Failed to open new window") }
+    if (!win) {
+      throw new Error('Failed to open new window');
+    }
 
     win.onunload = onClose;
 
-    const titleElement = win.document.createElement(
-      'title'
-    );
+    const titleElement = win.document.createElement('title');
     titleElement.innerText = !!title ? title : '';
     win.document.head.appendChild(titleElement);
 
@@ -99,7 +61,6 @@ function StyledWindowPortal({
 
   // Close window on this window close
   useEffect(() => {
-
     if (!!externalWindow) {
       window.addEventListener('beforeunload', closeWindow);
     } else {
@@ -112,23 +73,21 @@ function StyledWindowPortal({
     if (!!externalWindow) {
       return () => {
         closeWindow();
-      }
+      };
     }
   }, [externalWindow]);
 
   // Call onOpen with externalWindow if they're defined
   useEffect(() => {
     if (externalWindow && onOpen) {
-      onOpen(externalWindow)
+      onOpen(externalWindow);
     }
-  }, [externalWindow, onOpen])
+  }, [externalWindow, onOpen]);
 
   if (!!externalWindow) {
     return (
       <StyleSheetManager target={externalWindow.document.head}>
-        <div>
-          {ReactDOM.createPortal(children, containerRef.current)}
-        </div>
+        <div>{ReactDOM.createPortal(children, containerRef.current)}</div>
       </StyleSheetManager>
     );
   } else {
@@ -137,7 +96,7 @@ function StyledWindowPortal({
 }
 
 StyledWindowPortal.defaultProps = {
-  onClose: () => { },
+  onClose: () => {},
   onOpen: undefined,
   title: 'New Window',
   name: '',
@@ -157,5 +116,3 @@ StyledWindowPortal.defaultProps = {
       window.screen.width / 2 - window.outerWidth / 2,
   },
 };
-
-export { StyledWindowPortal };
