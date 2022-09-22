@@ -12,7 +12,7 @@ import { useWindowSize } from './hooks/use-window-size';
 
 export type StyledWindowPortalProps = PropsWithChildren<{
   onClose?: () => any;
-  onOpen?: (win: Window | null) => void;
+  onOpen?: (win: Window) => void;
   target?: string;
   /**
    * @deprecated
