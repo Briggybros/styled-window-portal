@@ -1,5 +1,5 @@
 type WindowPropFactory<T> = (props: WindowProps, window: Window) => T;
-type WindowProp<T> = T | WindowPropFactory<T>;
+export type WindowProp<T> = T | WindowPropFactory<T>;
 
 export type WindowProps = {
   /**

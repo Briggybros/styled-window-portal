@@ -38,7 +38,7 @@
     "build:esm": "babel -x '.ts,.tsx' ./src/**/* --out-dir lib",
     "build:types": "tsc --emitDeclarationOnly -p ./tsconfig.json --outDir ./lib",
     "test": "run-s test:*",
-    "reformat": "prettier --write 'src/**/*'"
+    "reformat": "prettier --write 'src/**/*' 'example/src/**/*'"
   },
   "peerDependencies": {
     "react": ">=16.8.0",

@@ -10,7 +10,7 @@ export function useWindow(
 
   // Create window
   useEffect(() => {
-    const _win = window.open('', target, windowPropsToString(props));
+    const _win = window.open('', target, windowPropsToString(props, window));
 
     if (!_win) {
       throw new Error('Failed to open new window');

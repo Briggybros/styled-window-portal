@@ -1,9 +1,7 @@
 import React, {
   PropsWithChildren,
-  useCallback,
   useEffect,
-  useRef,
-  useState,
+  useMemo,
 } from 'react';
 import ReactDOM from 'react-dom';
 import { StyleSheetManager } from 'styled-components';
@@ -13,6 +11,7 @@ import { injectGlobalStyle } from './util/inject-global-style';
 import { useWindow } from './hooks/use-window';
 import { useTitle } from './hooks/use-title';
 import { useContainer } from './hooks/use-container';
+import { useWindowPosition } from './hooks/use-window-position';
 
 export type StyledWindowPortalProps = PropsWithChildren<{
   onClose?: () => any;
@@ -30,14 +29,17 @@ export function StyledWindowPortal({
   title = StyledWindowPortal.defaultProps.title,
   windowProps = StyledWindowPortal.defaultProps.windowProps,
 }: StyledWindowPortalProps) {
-  // Create window
-  const externalWindow = useWindow(target, {
-    ...StyledWindowPortal.defaultProps.windowProps,
-    ...windowProps,
-  });
+  const winProps = useMemo(
+    () => ({ ...StyledWindowPortal.defaultProps.windowProps, ...windowProps }),
+    [windowProps]
+  );
 
-  useTitle(title, externalWindow);
+  // Create window
+  const externalWindow = useWindow(target, winProps);
+
   const containerRef = useContainer(externalWindow);
+  useTitle(title, externalWindow);
+  useWindowPosition(winProps, externalWindow);
 
   // Inject styles into window
   useEffect(() => {
