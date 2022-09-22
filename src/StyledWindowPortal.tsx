@@ -1,8 +1,4 @@
-import React, {
-  PropsWithChildren,
-  useEffect,
-  useMemo,
-} from 'react';
+import React, { PropsWithChildren, useEffect, useMemo } from 'react';
 import ReactDOM from 'react-dom';
 import { StyleSheetManager } from 'styled-components';
 
@@ -12,6 +8,7 @@ import { useWindow } from './hooks/use-window';
 import { useTitle } from './hooks/use-title';
 import { useContainer } from './hooks/use-container';
 import { useWindowPosition } from './hooks/use-window-position';
+import { useWindowSize } from './hooks/use-window-size';
 
 export type StyledWindowPortalProps = PropsWithChildren<{
   onClose?: () => any;
@@ -40,6 +37,7 @@ export function StyledWindowPortal({
   const containerRef = useContainer(externalWindow);
   useTitle(title, externalWindow);
   useWindowPosition(winProps, externalWindow);
+  useWindowSize(winProps, externalWindow);
 
   // Inject styles into window
   useEffect(() => {

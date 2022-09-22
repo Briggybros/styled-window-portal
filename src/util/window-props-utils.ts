@@ -15,6 +15,20 @@ export function windowPropToString(
   }
 }
 
+export function windowPropToNumber(
+  prop: WindowProps[string],
+  windowProps: WindowProps,
+  window?: Window
+): number {
+  if (!window) return 0;
+
+  const n = Number(windowPropToString(prop, windowProps, window));
+
+  if (Number.isNaN(n)) return 0;
+
+  return n;
+}
+
 export function windowPropsToString(props: WindowProps, win: Window) {
   return Object.entries(props)
     .map(([key, value]) => `${key}=${windowPropToString(value, props, win)}`)

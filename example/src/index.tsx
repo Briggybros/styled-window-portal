@@ -28,6 +28,8 @@ function App() {
     () => ({
       left: count,
       top: count,
+      width: 500 + count,
+      height: 400 + count,
     }),
     [count]
   );

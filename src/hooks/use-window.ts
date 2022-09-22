@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { WindowProps } from '../window-props';
-import { windowPropsToString } from '../util/window-props-to-string';
+import { windowPropsToString } from '../util/window-props-utils';
 
 export function useWindow(
   target: string,
