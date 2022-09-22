@@ -120,9 +120,9 @@ export function StyledWindowPortal({
 
   // Call onOpen with externalWindow if they're defined
   useEffect(() => {
-    if (externalWindow) {
-      onOpen?.(externalWindow);
-    }
+    if (!externalWindow) return;
+
+    onOpen?.(externalWindow);
   }, [externalWindow, onOpen]);
 
   if (!!externalWindow) {
