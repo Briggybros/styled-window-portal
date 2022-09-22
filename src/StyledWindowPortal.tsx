@@ -33,10 +33,17 @@ export function StyledWindowPortal({
 
   // Create window
   const externalWindow = useWindow(target, winProps);
-
+  
+  // Container to portal into
   const containerRef = useContainer(externalWindow);
+
+  // Reactively maintain window title
   useTitle(title, externalWindow);
+  
+  // Reactively maintain window position
   useWindowPosition(winProps, externalWindow);
+
+  // Reactively maintain window size
   useWindowSize(winProps, externalWindow);
 
   // Inject styles into window
