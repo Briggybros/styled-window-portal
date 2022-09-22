@@ -30,15 +30,16 @@ export function StyledWindowPortal({
 }: StyledWindowPortalProps) {
   // Window in use
   const [externalWindow, setExternalWindow] = useState<Window | null>(null);
-  
+
   // Ref to div for portal
   const containerRef = useRef(document.createElement('div'));
   // Title ref
   const titleRef = useRef(document.createElement('title'));
 
-  const closeWindow = useCallback(() => externalWindow?.close(), [
-    externalWindow,
-  ]);
+  const closeWindow = useCallback(() => {
+    externalWindow?.close();
+    setExternalWindow(null);
+  }, [externalWindow]);
 
   // Create window
   useEffect(() => {
@@ -75,13 +76,12 @@ export function StyledWindowPortal({
 
   // Close window on this window close
   useEffect(() => {
-    if (!!externalWindow) {
-      window.addEventListener('beforeunload', closeWindow);
-    } else {
+    window.addEventListener('beforeunload', closeWindow);
+
+    return () => {
       window.removeEventListener('beforeunload', closeWindow);
     }
-  }, [externalWindow]);
-
+  }, [closeWindow])
   // Close window on unmount
   useEffect(() => {
     if (!!externalWindow) {
