@@ -28,18 +28,13 @@ export function StyledWindowPortal({
   onOpen = StyledWindowPortal.defaultProps.onOpen,
   children,
 }: StyledWindowPortalProps) {
-  // Window in use
-  const [externalWindow, setExternalWindow] = useState<Window | null>(null);
-
   // Ref to div for portal
   const containerRef = useRef(document.createElement('div'));
   // Title ref
   const titleRef = useRef(document.createElement('title'));
 
-  const closeWindow = useCallback(() => {
-    externalWindow?.close();
-    setExternalWindow(null);
-  }, [externalWindow]);
+  // Window in use
+  const [externalWindow, setExternalWindow] = useState<Window | null>(null);
 
   // Create window
   useEffect(() => {
@@ -56,15 +51,38 @@ export function StyledWindowPortal({
       throw new Error('Failed to open new window');
     }
 
-    win.onunload = onClose;
-
-    win.document.head.appendChild(titleRef.current);
-    win.document.body.appendChild(containerRef.current);
-
     injectGlobalStyle(win);
-
     setExternalWindow(win);
+
+    win.addEventListener('beforeunload', () => {
+      setExternalWindow(null);
+    })
+
+    return () => {
+      win?.close();
+    };
   }, []);
+
+  // Link onClose handler
+  useEffect(() => {
+    if (!externalWindow) return;
+    externalWindow.onunload = onClose;
+  }, [externalWindow, onClose]);
+
+  // Make sure window has title
+  useEffect(() => {
+    if (!externalWindow) return;
+
+    const existingTitle = externalWindow.document.querySelector('title');
+
+    if (existingTitle === titleRef.current) return;
+
+    if (existingTitle) {
+      externalWindow.document.head.removeChild(existingTitle);
+    }
+
+    externalWindow.document.head.appendChild(titleRef.current);
+  }, [externalWindow, titleRef]);
 
   // Update title on change
   useEffect(() => {
@@ -74,21 +92,30 @@ export function StyledWindowPortal({
     titleEl.innerText = title;
   }, [title, titleRef]);
 
+  // Make sure window has container
+  useEffect(() => {
+    if (!externalWindow) return;
+
+    const existingContainer = externalWindow.document.querySelector('body>div');
+
+    if (existingContainer === containerRef.current) return;
+
+    if (existingContainer) {
+      externalWindow.document.body.removeChild(existingContainer);
+    }
+
+    externalWindow.document.body.appendChild(containerRef.current);
+  }, [externalWindow, containerRef]);
+
   // Close window on this window close
   useEffect(() => {
-    window.addEventListener('beforeunload', closeWindow);
+    const close = () => externalWindow?.close();
+
+    window.addEventListener('beforeunload', close);
 
     return () => {
-      window.removeEventListener('beforeunload', closeWindow);
-    }
-  }, [closeWindow])
-  // Close window on unmount
-  useEffect(() => {
-    if (!!externalWindow) {
-      return () => {
-        closeWindow();
-      };
-    }
+      window.removeEventListener('beforeunload', close);
+    };
   }, [externalWindow]);
 
   // Call onOpen with externalWindow if they're defined
